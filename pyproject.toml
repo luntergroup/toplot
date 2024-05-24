@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+dynamic = ["version"]
+name = "toplot"
+description = "Visualize the weights (i.e., the topics) and hidden units (i.e., topic proportions) of topic models"
+authors = [
+  {name = "Hylke Donker", email = "h.c.donker@umcg.nl"},
+  {name = "Dorien Neijzen", email = "d.neijzen@umcg.nl"},
+  ]
+readme = "README.md"
+license = {text = "MIT License"}
+keywords =[ "topic models", "visualization"]
+requires-python = ">=3.11"
+dependencies = [
+    "jax",
+    "matplotlib",
+    "numpy",
+    "python_tsp",
+]
