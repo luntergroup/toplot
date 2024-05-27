@@ -2,11 +2,13 @@
 
 from functools import partial
 
-from matplotlib import pyplot as plt
-import numpy as np
 from jax import tree
+from matplotlib import pyplot as plt
+from matplotlib.colors import TABLEAU_COLORS
+import numpy as np
+import pandas as pd
 
-from utils import dataframe_to_pytree
+from .utils import dataframe_to_pytree
 
 
 def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):
@@ -95,4 +97,71 @@ def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=
     # Rotate the x-axis labels.
     ax.tick_params(axis="x", labelrotation=90, labelsize=fontsize)
     ax.set_ylabel("Probability")
+    return ax
+
+
+def bar_plot(
+    dataframe: pd.DataFrame, quantile_range=(0.025, 0.975), label=None, ax=None
+):
+    """Plot posterior of topic weights as an unfolded array of probability bars.
+
+    Args:
+        dataframe: Posterior samples (rows) of topic weights. This dataframe consists of
+            two-level columns that group categories that belong to the same multinomial.
+            Second level columns must sum to one.
+        quantile_range: Range of quantiles to plot as error bars.
+        label: A legend label for the plot.
+        ax: Matplotlib axes to plot on.
+
+        Example:
+        ```python
+        from numpy.random import dirichlet
+        import pandas as pd
+
+        weights_bmi = dirichlet([16.0, 32.0, 32.0], size=1_000)
+        weights_sex = dirichlet([8.1, 4.1], size=1_000)
+        weights = pd.concat(
+            {
+                "BMI": pd.DataFrame(weights_bmi, columns=["Underweight", "Healthy Weight", "Overweight"]),
+                "sex": pd.DataFrame(weights_sex, columns=["Male", "Female"]),
+            },
+            axis="columns",
+        )
+        bar_plot(weights)
+        ```
+
+    Returns:
+        Reference to matplotlib bar axes.
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    # TODO: Also allow for a single-level column (i.e., single multinomial) dataframe.
+    if dataframe.columns.nlevels != 2:
+        raise ValueError(
+            "Dataframe must have two column levels: multinomial and category."
+        )
+
+    # Compute summary statistics of distribution.
+    avg = dataframe.apply(np.mean, axis="rows")
+    lower = dataframe.apply(np.quantile, q=quantile_range[0], axis="rows")
+    upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
+    err = np.stack([avg - lower, upper - avg], axis=0)
+
+    # Give each category set (=first column level) a different colour.
+    multinomial_names = dataframe.columns.unique(level=0)
+    repeated_colours = 5 * tuple(TABLEAU_COLORS)  # Five times should suffice.
+    colour_of_multinomial = dict(zip(multinomial_names, repeated_colours))
+    colours = [
+        colour_of_multinomial[name] for name in dataframe.columns.get_level_values(0)
+    ]
+    feature_names = [
+        f"{set_name}: {item_name}" for set_name, item_name in dataframe.columns
+    ]
+
+    ax.bar(feature_names, height=avg, yerr=err, label=label, color=colours)
+    ax.set_ylabel("Probability")
+    ax.tick_params(axis="x", labelrotation=90)
+    margin = 0.025
+    ax.set_ylim(0 - margin, 1 + margin)
     return ax
