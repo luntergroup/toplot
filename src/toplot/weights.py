@@ -1,4 +1,4 @@
-"""This module contains visualization with uncertainty estimates."""
+"""Visualization of the weights/components/topics with uncertainty estimates."""
 
 from functools import partial
 
@@ -8,9 +8,8 @@ from jax import tree
 
 from utils import dataframe_to_pytree
 
-def bar_plot_folded(
-    dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None
-):
+
+def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):
     """Plot posterior topic weights as probability bars by stacking items per set.
 
     Ags:
