@@ -15,8 +15,9 @@ license = {text = "MIT License"}
 keywords =[ "topic models", "visualization"]
 requires-python = ">=3.11"
 dependencies = [
-    "jax",
-    "matplotlib",
-    "numpy",
-    "python_tsp",
+  "jax[cpu]",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "python_tsp",
 ]

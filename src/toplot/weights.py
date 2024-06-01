@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from jax import tree
 
-from utils import dataframe_to_pytree
+from .utils import dataframe_to_pytree
 
 
 def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):

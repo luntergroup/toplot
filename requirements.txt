@@ -1,0 +1,5 @@
+jax[cpu]
+matplotlib
+numpy
+pandas
+python_tsp
