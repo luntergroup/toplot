@@ -1,0 +1,11 @@
+{
+    "name": "Static docs",
+    "description": "Build and deploy documentation.",
+    "iconName": "html",
+    "categories": [
+        "Pages",
+        "HTML",
+        "JavaScript",
+        "CSS"
+    ]
+}
