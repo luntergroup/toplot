@@ -40,9 +40,9 @@ bar_plot(weights)
 
 If you have many multinomials, you can reduce the size of the plot by folding the categories (e.g., "Underweight", "Healthy Weight", and "Overweight") belonging to the same multinomial (BMI) into a single bar
 
-![Visualization of topic weights with bar_plot_folded.](gallery/figures/bar_plot_folded.svg)
+![Visualization of topic weights with bar_plot_stacked.](gallery/figures/bar_plot_folded.svg)
 ```python
-bar_plot_folded(weights)
+bar_plot_stacked(weights)
 ```
 
 Next, we plot the hidden units/topic identities $[\pmb{h}^{(1)}, \dots, \pmb{h}^{(m)}]^T$: that is, for each example/participant/document $i$, the proportion over the components/topics. Let's generate the (average) proportion for $m=30$ examples to visualize:

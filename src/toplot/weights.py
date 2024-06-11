@@ -5,13 +5,14 @@ from functools import partial
 from jax import tree
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
+import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 
 from .utils import dataframe_to_pytree
 
 
-def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):
+def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):
     """Plot posterior topic weights as probability bars by stacking items per set.
 
     Ags:
@@ -36,7 +37,7 @@ def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=
             },
             axis="columns",
         )
-        plot_topic_posterior_folded(weights)
+        bar_plot_stacked(weights)
         ```
 
     Returns: Reference to the axes.
@@ -96,6 +97,7 @@ def bar_plot_folded(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=
             )
     # Rotate the x-axis labels.
     ax.tick_params(axis="x", labelrotation=90, labelsize=fontsize)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax.set_ylabel("Probability")
     return ax
 
@@ -163,5 +165,6 @@ def bar_plot(
     ax.set_ylabel("Probability")
     ax.tick_params(axis="x", labelrotation=90)
     margin = 0.025
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax.set_ylim(0 - margin, 1 + margin)
     return ax
