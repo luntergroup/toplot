@@ -65,3 +65,10 @@ You can emphasize the periodicity inherent in the travelling salesman solution b
 ```python
 plot_polar_cohort(hidden)
 ```
+
+For the scattermap plot call:
+```
+scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
+```
+Resulting in:
+![Visualization of weights, with either counts of relative weights per 'word' and per 'topic' on the y- and x-axis, respectively.](gallery/figures/scattermap_plot.png)
