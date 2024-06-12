@@ -9,6 +9,10 @@ import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 
+import seaborn as sns; sns.set()
+import numpy as np; np.random.seed(73)
+from scattermap import scattermap
+
 from .utils import dataframe_to_pytree
 
 
@@ -168,3 +172,49 @@ def bar_plot(
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax.set_ylim(0 - margin, 1 + margin)
     return ax
+
+def scattermap_plot(dataframe,dataframe_counts, marker_scaler = 10, scale_val_x_counts = 2, scale_val_y_counts = 2):
+    '''
+    dataframe: dataframe in two levels {feature: words} containing phi, determines markers and their color
+    dataframe_counts: another dataframe of same structure containing counts, determines markersize and bars at the axes
+    marker_scaler: scale size of markers
+    scale_val_x_counts: scale bar size
+    scale_val_y_counts: scale bar size
+
+    There are issues with figure size for very large dataframes (many topics), possibly fix for future use.
+    '''
+
+    topic_counts = dataframe_counts.sum(axis=1)/dataframe_counts.sum().sum()
+    word_counts = dataframe_counts.sum()/dataframe_counts.sum().sum()
+    topic_bar_positions = np.arange(start=.5, stop=len(topic_counts), step=1)
+    word_bar_positions = np.arange(start=.5, stop=len(word_counts), step=1)
+
+    w_, h_ = np.shape(dataframe.T)
+    h = h_
+    w = 0.7*w_
+    sns.set(style="darkgrid", font_scale=1.5, rc={'axes.facecolor':'#F0E6EB', "grid.linestyle": "-","grid.color": '#b0b0b0'})
+    fig = plt.figure(figsize=(h, w))
+    ax1 = scattermap(data=dataframe.T,
+                    cmap="YlGnBu",
+                    marker_size=marker_scaler * dataframe_counts.T,
+                    vmax=1,
+                    linecolor = 'black',
+                    linewidths = 0.2)
+
+    # x axis on top
+    ax1.xaxis.tick_bottom()
+    ax1.xaxis.set_label_position('bottom')
+    ax1.tick_params('x', labelrotation=90)
+
+    # Add frequencies of attributes as barplot to y-axis
+    ax1.barh(list(word_bar_positions), -scale_val_y_counts*word_counts, 0.6, alpha=1,edgecolor = "none")
+    print(len(word_bar_positions), len(word_counts))
+    ax1.axvline(x=0, color='k')
+    ax1.axhline(0, color='k')
+
+    ax1.set_xlim(-1,dataframe_counts.shape[0])
+
+    # Add frequencies of diagnosis as barplot to x-axis
+    ax1.bar(topic_bar_positions, -scale_val_x_counts*topic_counts, 0.6,color='#41b6c4',bottom=0,edgecolor = "none")
+
+    ax1.set_ylim([-0.8,len(dataframe)])
