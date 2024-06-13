@@ -3,9 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
-# from seaborn.external.six import string_types
-
-from seaborn.utils import despine, axis_ticklabels_overlap, relative_luminance, to_utf8
+from seaborn.utils import despine, axis_ticklabels_overlap
 
 
 class _ScatterMapper(_HeatMapper):
@@ -80,7 +78,7 @@ class _ScatterMapper(_HeatMapper):
             vmin=self.vmin,
             vmax=self.vmax,
             s=self.marker_size,
-            **kws
+            **kws,
         )
 
         # Set the axis limits
@@ -147,7 +145,7 @@ def scattermap(
     yticklabels="auto",
     mask=None,
     ax=None,
-    **kwargs
+    **kwargs,
 ):
     """Plot rectangular data as a color-encoded matrix.
 

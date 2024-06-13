@@ -40,7 +40,7 @@ bar_plot(weights)
 
 If you have many multinomials, you can reduce the size of the plot by folding the categories (e.g., "Underweight", "Healthy Weight", and "Overweight") belonging to the same multinomial (BMI) into a single bar
 
-![Visualization of topic weights with bar_plot_stacked.](gallery/figures/bar_plot_folded.svg)
+![Visualization of topic weights with bar_plot_stacked.](gallery/figures/bar_plot_stacked.svg)
 ```python
 bar_plot_stacked(weights)
 ```
@@ -68,6 +68,8 @@ plot_polar_cohort(hidden)
 
 For the scattermap plot call:
 ```
+from toplot import scattermap_plot
+
 scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
 ```
 Resulting in:
