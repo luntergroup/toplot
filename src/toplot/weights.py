@@ -5,6 +5,7 @@ from functools import partial
 from jax import tree
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
+from matplotlib.pyplot import cm, rcParams
 import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
@@ -217,4 +218,22 @@ def scattermap_plot(dataframe,dataframe_counts, marker_scaler = 10, scale_val_x_
     # Add frequencies of diagnosis as barplot to x-axis
     ax1.bar(topic_bar_positions, -scale_val_x_counts*topic_counts, 0.6,color='#41b6c4',bottom=0,edgecolor = "none")
 
-    ax1.set_ylim([-0.8,len(dataframe)])
+    ax1.set_ylim([-0.8,len(dataframe.T)])
+
+    def top_words(dataframe, dataframe_counts):
+        '''
+        Visualize the most important 'words' of categories over featrures per latent variable.
+        '''
+
+    n_topics = 6
+    color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
+    rcParams['figure.figsize'] = 3, 20
+    fig, ax = plt.subplots(nrows=6, ncols=1, sharex=True, sharey=False)
+    # plt.title('Top 10 words in the topics with their count')
+    plt.xlabel('Count')
+    plt.ylabel('Words')
+    plt.tight_layout()
+    for t in range(n_topics):
+        kleur = next(color)
+        for keys, vals in topic_top_words[t].items():
+            ax[t].barh(keys, vals, color=kleur)
