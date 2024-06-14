@@ -197,7 +197,7 @@ def scattermap_plot(
     w_, h_ = np.shape(dataframe.T)
     h = h_
     w = 0.7 * w_
-    fig = plt.figure(figsize=(h, w))
+    plt.figure(figsize=(h, w))
 
     with sns.set(
         style="darkgrid",

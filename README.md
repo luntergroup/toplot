@@ -33,7 +33,7 @@ This is how you visualize `weights`, including the 95% quantile range:
 
 ![Visualization of topic weights with bar_plot.](gallery/figures/bar_plot.svg)
 ```python
-from toplot import bar_plot, bar_plot_folded
+from toplot import bar_plot, bar_plot_stacked
 
 bar_plot(weights)
 ```
@@ -67,7 +67,7 @@ plot_polar_cohort(hidden)
 ```
 
 For the scattermap plot call:
-```
+```python
 from toplot import scattermap_plot
 
 scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
