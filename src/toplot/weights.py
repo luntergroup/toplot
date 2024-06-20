@@ -199,7 +199,7 @@ def scattermap_plot(
     w = 0.7 * w_
     plt.figure(figsize=(h, w))
 
-    with sns.set(
+    sns.set_theme(
         style="darkgrid",
         font_scale=1.5,
         rc={
@@ -207,42 +207,42 @@ def scattermap_plot(
             "grid.linestyle": "-",
             "grid.color": "#b0b0b0",
         },
-    ):
-        ax = scattermap(
-            data=dataframe.T,
-            cmap="YlGnBu",
-            marker_size=marker_scaler * dataframe_counts.T,
-            vmax=1,
-            linecolor="black",
-            linewidths=0.2,
-        )
+    )
+    ax = scattermap(
+        data=dataframe.T,
+        cmap="YlGnBu",
+        marker_size=marker_scaler * dataframe_counts.T,
+        vmax=1,
+        linecolor="black",
+        linewidths=0.2,
+    )
 
-        # x axis on top
-        ax.xaxis.tick_bottom()
-        ax.xaxis.set_label_position("bottom")
-        ax.tick_params("x", labelrotation=90)
+    # x axis on top
+    ax.xaxis.tick_bottom()
+    ax.xaxis.set_label_position("bottom")
+    ax.tick_params("x", labelrotation=90)
 
-        # Add frequencies of attributes as barplot to y-axis
-        ax.barh(
-            list(word_bar_positions),
-            -scale_val_y_counts * word_counts,
-            0.6,
-            alpha=1,
-            edgecolor="none",
-        )
-        ax.axvline(x=0, color="k")
-        ax.axhline(0, color="k")
+    # Add frequencies of attributes as barplot to y-axis
+    ax.barh(
+        list(word_bar_positions),
+        -scale_val_y_counts * word_counts,
+        0.6,
+        alpha=1,
+        edgecolor="none",
+    )
+    ax.axvline(x=0, color="k")
+    ax.axhline(0, color="k")
 
-        ax.set_xlim(-1, dataframe_counts.shape[0])
+    ax.set_xlim(-1, dataframe_counts.shape[0])
 
-        # Add frequencies of diagnosis as barplot to x-axis
-        ax.bar(
-            topic_bar_positions,
-            -scale_val_x_counts * topic_counts,
-            0.6,
-            color="#41b6c4",
-            bottom=0,
-            edgecolor="none",
-        )
+    # Add frequencies of diagnosis as barplot to x-axis
+    ax.bar(
+        topic_bar_positions,
+        -scale_val_x_counts * topic_counts,
+        0.6,
+        color="#41b6c4",
+        bottom=0,
+        edgecolor="none",
+    )
 
-        ax.set_ylim([-0.8, len(dataframe)])
+    ax.set_ylim([-0.8, len(dataframe)])
