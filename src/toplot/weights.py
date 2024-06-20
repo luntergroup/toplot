@@ -2,7 +2,7 @@
 
 from functools import partial
 
-from jax import tree
+# from jax import tree
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 import matplotlib.ticker as mtick
