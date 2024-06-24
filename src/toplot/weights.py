@@ -195,9 +195,11 @@ def scattermap_plot(
     word_bar_positions = np.arange(start=0.5, stop=len(word_counts), step=1)
 
     w_, h_ = np.shape(dataframe.T)
-    h = h_
-    w = 0.7 * w_
-    plt.figure(figsize=(h, w))
+    fisize = 40
+
+    h = fisize
+    w = 0.5 * fisize
+    plt.figure(figsize=(w, h))
 
     sns.set_theme(
         style="darkgrid",
@@ -245,4 +247,5 @@ def scattermap_plot(
         edgecolor="none",
     )
 
-    ax.set_ylim([-0.8, dataframe.shape[1]])
+    ax.set_ylim([-1.5, dataframe_counts.shape[1]])
+
