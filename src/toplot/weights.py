@@ -245,4 +245,4 @@ def scattermap_plot(
         edgecolor="none",
     )
 
-    ax.set_ylim([-0.8, len(dataframe)])
+    ax.set_ylim([-0.8, dataframe.shape[1]])
