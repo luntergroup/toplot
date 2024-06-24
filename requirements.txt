@@ -1,4 +1,3 @@
-jax[cpu]
 matplotlib
 numpy
 pandas
