@@ -249,8 +249,10 @@ def scattermap_plot(
 
         ax.set_ylim([-1.5, dataframe_counts.shape[1]])
 
-def top_words(dataframe, dataframe_counts):
+def top_words(dataframe, dataframe_counts, number_of_words, title = None):
         '''
+        Dataframe contains [n_topics, words] weights for words for topic distritibutions (phi)
+        Dataframe_counts contains (optionally) counts for n_tw (topic-word counts)
         Visualize the most important 'words' of categories over featrures per latent variable.
         '''
 
@@ -266,3 +268,21 @@ def top_words(dataframe, dataframe_counts):
         kleur = next(color)
         for keys, vals in topic_top_words[t].items():
             ax[t].barh(keys, vals, color=kleur)
+        n_topics = dataframe.shape[0]
+        topic_top_words = {}
+        for i in range(len(dataframe)):
+            topic_top_words[i] = {}
+            for column in (dataframe_counts.iloc[i].nlargest(number_of_words).index):
+                topic_top_words[i][column] = dataframe_counts.loc[i,column]
+
+        color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
+        rcParams['figure.figsize'] = 3, 20
+        fig, ax = plt.subplots(nrows=n_topics, ncols=1, sharex=True, sharey=False)
+        plt.title(title)
+        plt.xlabel('Count')
+        plt.ylabel('Words')
+        plt.tight_layout()
+        for t in range(n_topics):
+            kleur = next(color)
+            for keys, vals in topic_top_words[t].items():
+                ax[t].barh(keys, vals, color=kleur)
