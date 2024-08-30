@@ -50,6 +50,10 @@ def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize
     if dataframe.columns.nlevels < 2:
         raise ValueError("Dataframe must have two-level columns.")
 
+    if len(dataframe.columns.unique()) < len(dataframe.columns):
+        raise ValueError("Dataframe column names must be uniquely identifiable.")
+
+
     # Compute summary statistics of the posterior samples.
     avg = dataframe.mean(axis=0)
     lower = dataframe.quantile(q=quantile_range[0], axis=0)
