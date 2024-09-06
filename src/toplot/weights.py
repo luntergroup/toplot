@@ -11,7 +11,13 @@ import seaborn as sns
 from .scattermap import scattermap
 
 
-def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize=None):
+def bar_plot_stacked(
+    dataframe,
+    quantile_range=(0.025, 0.975),
+    ax=None,
+    labels: bool = True,
+    fontsize=None,
+):
     """Plot posterior topic weights as probability bars by stacking items per set.
 
     Ags:
@@ -21,6 +27,7 @@ def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize
             level columns must sum to one.
         quantile_range: Range of quantiles to plot as error bars.
         ax: Matplotlib axes to plot on.
+        labels: If `True`, annotate bars with category labels.
         fontsize: Font size for the category labels.
 
     Example:
@@ -52,7 +59,6 @@ def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize
 
     if len(dataframe.columns.unique()) < len(dataframe.columns):
         raise ValueError("Dataframe column names must be uniquely identifiable.")
-
 
     # Compute summary statistics of the posterior samples.
     avg = dataframe.mean(axis=0)
@@ -91,14 +97,15 @@ def bar_plot_stacked(dataframe, quantile_range=(0.025, 0.975), ax=None, fontsize
                 color=color,
                 yerr=err_j,
             )
-            ax.text(
-                x=feature_name,
-                y=offsets[j] + feature_weights.loc[category] / 2,
-                s=category,
-                ha="center",
-                va="center",
-                fontsize=fontsize,
-            )
+            if labels:
+                ax.text(
+                    x=feature_name,
+                    y=offsets[j] + feature_weights.loc[category] / 2,
+                    s=category,
+                    ha="center",
+                    va="center",
+                    fontsize=fontsize,
+                )
     # Rotate the x-axis labels.
     ax.tick_params(axis="x", labelrotation=90, labelsize=fontsize)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
@@ -250,20 +257,21 @@ def scattermap_plot(
 
         ax.set_ylim([-1.5, dataframe_counts.shape[1]])
 
-def top_words(dataframe, dataframe_counts, number_of_words, title = None):
-        '''
-        Dataframe contains [n_topics, words] weights for words for topic distritibutions (phi)
-        Dataframe_counts contains (optionally) counts for n_tw (topic-word counts)
-        Visualize the most important 'words' of categories over featrures per latent variable.
-        '''
+
+def top_words(dataframe, dataframe_counts, number_of_words, title=None):
+    """
+    Dataframe contains [n_topics, words] weights for words for topic distritibutions (phi)
+    Dataframe_counts contains (optionally) counts for n_tw (topic-word counts)
+    Visualize the most important 'words' of categories over featrures per latent variable.
+    """
 
     n_topics = 6
     color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
-    rcParams['figure.figsize'] = 3, 20
+    rcParams["figure.figsize"] = 3, 20
     fig, ax = plt.subplots(nrows=6, ncols=1, sharex=True, sharey=False)
     # plt.title('Top 10 words in the topics with their count')
-    plt.xlabel('Count')
-    plt.ylabel('Words')
+    plt.xlabel("Count")
+    plt.ylabel("Words")
     plt.tight_layout()
     for t in range(n_topics):
         kleur = next(color)
@@ -273,15 +281,15 @@ def top_words(dataframe, dataframe_counts, number_of_words, title = None):
         topic_top_words = {}
         for i in range(len(dataframe)):
             topic_top_words[i] = {}
-            for column in (dataframe_counts.iloc[i].nlargest(number_of_words).index):
-                topic_top_words[i][column] = dataframe_counts.loc[i,column]
+            for column in dataframe_counts.iloc[i].nlargest(number_of_words).index:
+                topic_top_words[i][column] = dataframe_counts.loc[i, column]
 
         color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
-        rcParams['figure.figsize'] = 3, 20
+        rcParams["figure.figsize"] = 3, 20
         fig, ax = plt.subplots(nrows=n_topics, ncols=1, sharex=True, sharey=False)
         plt.title(title)
-        plt.xlabel('Count')
-        plt.ylabel('Words')
+        plt.xlabel("Count")
+        plt.ylabel("Words")
         plt.tight_layout()
         for t in range(n_topics):
             kleur = next(color)
