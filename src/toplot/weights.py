@@ -114,7 +114,11 @@ def bar_plot_stacked(
 
 
 def bar_plot(
-    dataframe: pd.DataFrame, quantile_range=(0.025, 0.975), label=None, ax=None
+    dataframe: pd.DataFrame,
+    quantile_range=(0.025, 0.975),
+    label=None,
+    ax=None,
+    color_xlabels: bool = False,
 ):
     """Plot posterior of topic weights as an unfolded array of probability bars.
 
@@ -125,6 +129,7 @@ def bar_plot(
         quantile_range: Range of quantiles to plot as error bars.
         label: A legend label for the plot.
         ax: Matplotlib axes to plot on.
+        color_xlabels: If `True`, pair the colours of the x-axis labels with the bars.
 
         Example:
         ```python
@@ -175,6 +180,12 @@ def bar_plot(
     ax.bar(feature_names, height=avg, yerr=err, label=label, color=colours)
     ax.set_ylabel("Probability")
     ax.tick_params(axis="x", labelrotation=90)
+
+    if color_xlabels:
+        # Set the color of the x-tick labels to match the corresponding bar color.
+        for xtick, color in zip(ax.get_xticklabels(), colours):
+            xtick.set_color(color)
+
     margin = 0.025
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax.set_ylim(0 - margin, 1 + margin)
