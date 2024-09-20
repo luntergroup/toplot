@@ -1,6 +1,5 @@
 """Visualization of the weights/components/topics with uncertainty estimates."""
 
-from functools import partial
 from typing import Literal
 
 from matplotlib import pyplot as plt
@@ -17,7 +16,7 @@ from .scattermap import scattermap
 def bar_plot_stacked(
     dataframe,
     quantile_range=(0.025, 0.975),
-    height: Literal["mean"] | float = "mean",
+    height: Literal["mean", "median"] = "mean",
     ax=None,
     labels: bool = True,
     fontsize=None,
@@ -30,8 +29,7 @@ def bar_plot_stacked(
             categories that belong to the same item set (i.e., multinomial). Second
             level columns must sum to one.
         quantile_range: Range of quantiles to plot as error bars.
-        height: How to compute the height of the bars. If a float, the height is the
-            quantile of the posterior samples. Otherwise, the height is the mean.
+        height: How to compute the height of the bars.
         ax: Matplotlib axes to plot on.
         labels: If `True`, annotate bars with category labels.
         fontsize: Font size for the category labels.
@@ -66,9 +64,11 @@ def bar_plot_stacked(
     if len(dataframe.columns.unique()) < len(dataframe.columns):
         raise ValueError("Dataframe column names must be uniquely identifiable.")
 
-    height_fn = partial(np.quantile, q=height)
+    height_fn = np.mean
     if height == "mean":
         height_fn = np.mean
+    elif height == "median":
+        height_fn = np.median
 
     # Compute summary statistics of the posterior samples.
     estimate = dataframe.apply(height_fn, axis="rows")
@@ -80,7 +80,7 @@ def bar_plot_stacked(
     if any(err < 0):
         msg = "Negative error bars detected."
         if height == "mean":
-            msg += " Consider settings the height of the bars to a quantile."
+            msg += " Consider settings the height to the median."
         raise ValueError(msg)
 
     # Make a bar per leaf by stacking the categories on top of each other --> the per
@@ -132,7 +132,7 @@ def bar_plot_stacked(
 def bar_plot(
     dataframe: pd.DataFrame,
     quantile_range=(0.025, 0.975),
-    height: Literal["mean"] | float = "mean",
+    height: Literal["mean", "median"] = "mean",
     label=None,
     ax=None,
     color_xlabels: bool = False,
@@ -144,8 +144,7 @@ def bar_plot(
             two-level columns that group categories that belong to the same multinomial.
             Second level columns must sum to one.
         quantile_range: Range of quantiles to plot as error bars.
-        height: How to compute the height of the bars. If a float, the height is the
-            quantile of the posterior samples. Otherwise, the height is the mean.
+        height: How to compute the height of the bars.
         label: A legend label for the plot.
         ax: Matplotlib axes to plot on.
         color_xlabels: If `True`, pair the colours of the x-axis labels with the bars.
@@ -179,15 +178,23 @@ def bar_plot(
             "Dataframe must have two column levels: multinomial and category."
         )
 
-    height_fn = partial(np.quantile, q=height)
+    height_fn = np.mean
     if height == "mean":
         height_fn = np.mean
+    elif height == "median":
+        height_fn = np.median
 
     # Compute summary statistics of distribution.
     estimate = dataframe.apply(height_fn, axis="rows")
     lower = dataframe.apply(np.quantile, q=quantile_range[0], axis="rows")
     upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
     err = np.stack([estimate - lower, upper - estimate], axis=0)
+
+    if any(err < 0):
+        msg = "Negative error bars detected."
+        if height == "mean":
+            msg += " Consider settings the height to the median."
+        raise ValueError(msg)
 
     # Give each category set (=first column level) a different colour.
     multinomial_names = dataframe.columns.unique(level=0)
