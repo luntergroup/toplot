@@ -1,5 +1,8 @@
 """Visualization of the weights/components/topics with uncertainty estimates."""
 
+from functools import partial
+from typing import Literal
+
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
 from matplotlib.pyplot import cm, rcParams
@@ -14,6 +17,7 @@ from .scattermap import scattermap
 def bar_plot_stacked(
     dataframe,
     quantile_range=(0.025, 0.975),
+    height: Literal["mean"] | float = "mean",
     ax=None,
     labels: bool = True,
     fontsize=None,
@@ -26,6 +30,8 @@ def bar_plot_stacked(
             categories that belong to the same item set (i.e., multinomial). Second
             level columns must sum to one.
         quantile_range: Range of quantiles to plot as error bars.
+        height: How to compute the height of the bars. If a float, the height is the
+            quantile of the posterior samples. Otherwise, the height is the mean.
         ax: Matplotlib axes to plot on.
         labels: If `True`, annotate bars with category labels.
         fontsize: Font size for the category labels.
@@ -60,20 +66,30 @@ def bar_plot_stacked(
     if len(dataframe.columns.unique()) < len(dataframe.columns):
         raise ValueError("Dataframe column names must be uniquely identifiable.")
 
+    height_fn = partial(np.quantile, q=height)
+    if height == "mean":
+        height_fn = np.mean
+
     # Compute summary statistics of the posterior samples.
-    avg = dataframe.mean(axis=0)
+    estimate = dataframe.apply(height_fn, axis="rows")
     lower = dataframe.quantile(q=quantile_range[0], axis=0)
     upper = dataframe.quantile(q=quantile_range[1], axis=0)
     # The error bars are the distance from the mean to the quantiles.
-    err = pd.concat([avg - lower, upper - avg], axis="columns")
+    err = pd.concat([estimate - lower, upper - estimate], axis="columns")
+
+    if any(err < 0):
+        msg = "Negative error bars detected."
+        if height == "mean":
+            msg += " Consider settings the height of the bars to a quantile."
+        raise ValueError(msg)
 
     # Make a bar per leaf by stacking the categories on top of each other --> the per
     # category bar offsets (relative to y = 0) are the cumulative distribution.
-    p_cum = avg.groupby(level=0).cumsum()
+    p_cum = estimate.groupby(level=0).cumsum()
 
     # For each leaf.
     for feature_name in dataframe.columns.unique(level=0):
-        feature_weights = avg.loc[feature_name]
+        feature_weights = estimate.loc[feature_name]
         feature_err = err.loc[feature_name]
         feature_cum = p_cum.loc[feature_name]
         offsets = np.pad(
@@ -116,6 +132,7 @@ def bar_plot_stacked(
 def bar_plot(
     dataframe: pd.DataFrame,
     quantile_range=(0.025, 0.975),
+    height: Literal["mean"] | float = "mean",
     label=None,
     ax=None,
     color_xlabels: bool = False,
@@ -127,6 +144,8 @@ def bar_plot(
             two-level columns that group categories that belong to the same multinomial.
             Second level columns must sum to one.
         quantile_range: Range of quantiles to plot as error bars.
+        height: How to compute the height of the bars. If a float, the height is the
+            quantile of the posterior samples. Otherwise, the height is the mean.
         label: A legend label for the plot.
         ax: Matplotlib axes to plot on.
         color_xlabels: If `True`, pair the colours of the x-axis labels with the bars.
@@ -160,11 +179,15 @@ def bar_plot(
             "Dataframe must have two column levels: multinomial and category."
         )
 
+    height_fn = partial(np.quantile, q=height)
+    if height == "mean":
+        height_fn = np.mean
+
     # Compute summary statistics of distribution.
-    avg = dataframe.apply(np.mean, axis="rows")
+    estimate = dataframe.apply(height_fn, axis="rows")
     lower = dataframe.apply(np.quantile, q=quantile_range[0], axis="rows")
     upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
-    err = np.stack([avg - lower, upper - avg], axis=0)
+    err = np.stack([estimate - lower, upper - estimate], axis=0)
 
     # Give each category set (=first column level) a different colour.
     multinomial_names = dataframe.columns.unique(level=0)
@@ -177,7 +200,7 @@ def bar_plot(
         f"{set_name}: {item_name}" for set_name, item_name in dataframe.columns
     ]
 
-    ax.bar(feature_names, height=avg, yerr=err, label=label, color=colours)
+    ax.bar(feature_names, height=estimate, yerr=err, label=label, color=colours)
     ax.set_ylabel("Probability")
     ax.tick_params(axis="x", labelrotation=90)
 
