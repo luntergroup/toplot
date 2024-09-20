@@ -77,7 +77,7 @@ def bar_plot_stacked(
     # The error bars are the distance from the mean to the quantiles.
     err = pd.concat([estimate - lower, upper - estimate], axis="columns")
 
-    if any(err < 0):
+    if any(err < -1e-6):
         msg = "Negative error bars detected."
         if height == "mean":
             msg += " Consider settings the height to the median."
@@ -190,7 +190,7 @@ def bar_plot(
     upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
     err = np.stack([estimate - lower, upper - estimate], axis=0)
 
-    if any(err < 0):
+    if any(err < -1e-6):
         msg = "Negative error bars detected."
         if height == "mean":
             msg += " Consider settings the height to the median."
