@@ -42,12 +42,12 @@ def _update_clusters(topic_distr, cluster_assignments):
 
 
 def cluster_latent_components(
-    weights, metric="jensenshannon", n_iterations: int = 11, verbose=False
+    *weights, metric="jensenshannon", n_iterations: int = 11, verbose=False
 ):
     r"""Solve cluster identifiability problem using the Hungarian algorithm.
 
-    Given `s=1,..,S` sets of `K` latent components that are similar upto a permutation
-    of the component index `k = 1,..,K` (e.g., from `S` model fits), match the
+    Given \( s=1,\dot,S \) sets of `K` latent components that are similar upto a permutation
+    of the component index \( k = 1,\dots,K \) (e.g., from `S` model fits), match the
     components `k` between the chains `s` and determine the centroid (i.e., the
     consensus component). The algorith uses multiple restarts and selects the best
     clustering based on the silhouette score.
@@ -56,8 +56,8 @@ def cluster_latent_components(
         See the notebook `examples/identifiability.ipynb`.
 
     Args:
-        weights: Per chain (leading axis), the components \( \pmb{W}_k \) (second axis)
-            to cluster.
+        *weights: The component matrices \( \pmb{W}_1, \dots, \pmb{W}_S \) to cluster.
+            Each matrix must have the same shape and is clustered on the  leading axis.
         metric: The metric to use for computing the pairwise distances between the
             components.
         n_iterations: Number of iterations to run the clustering algorithm.
@@ -68,29 +68,34 @@ def cluster_latent_components(
             axis).
         centeroids: The centre of mass of the clusters.
     """
+    if len(weights) < 2:
+        raise ValueError("Only one argument. Nothing to cluster against.")
+
+    # Restart the clustering algorithm with different chain centroids.
+    n_chains = n_restarts = len(weights)
+    n_components = len(weights[0])
+    weights_np = np.stack(weights)
+
     if metric == "jensenshannon":
-        if not np.all(weights.sum(axis=1) == 1):
+        if not np.all(weights_np.sum(axis=1) == 1):
             raise ValueError(
                 "Trailing axis of weights should sum to 1 when using Jenson-Shannon distance."
             )
-    # Restart the clustering algorithm with different chain centroids.
-    n_chains = n_restarts = weights.shape[0]
-    n_components = weights.shape[1]
 
     best_score = -1
     for i in range(n_restarts):
         # Restart clustering algorithm with centroid initially at the i-th chain.
-        centeroids = weights[i]
+        centeroids = weights_np[i]
 
         for _ in range(n_iterations):
             # 1) Assignment step.
-            cluster_assignments = _assign_clusters(weights, centeroids, metric)
+            cluster_assignments = _assign_clusters(weights_np, centeroids, metric)
 
             # 2) Update step.
-            centeroids = _update_clusters(weights, cluster_assignments)
+            centeroids = _update_clusters(weights_np, cluster_assignments)
 
             # 3) Compute pairwise distances per chain.
-            x_flat = weights.reshape([n_chains * n_components, -1])
+            x_flat = weights_np.reshape([n_chains * n_components, -1])
             distances = pdist(x_flat, metric=metric)
             X_dist = squareform(distances)
             ss = silhouette_score(
