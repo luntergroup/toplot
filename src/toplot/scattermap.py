@@ -48,12 +48,14 @@ class _ScatterMapper(_HeatMapper):
 
         self.marker = marker
 
-        if isinstance(marker_size, float) or isinstance(marker_size, int):
+        if isinstance(marker_size, (float, int)):
             self.marker_size = marker_size
         elif isinstance(marker_size, pd.DataFrame):
-            self.marker_size = marker_size.loc[
-                self.data.index, self.data.columns
-            ].values
+            self.marker_size = (
+                marker_size.loc[self.data.index, self.data.columns]
+                .to_numpy()
+                .astype(float)
+            )
         else:
             self.marker_size = marker_size
 
