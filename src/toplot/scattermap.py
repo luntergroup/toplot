@@ -26,6 +26,7 @@ class _ScatterMapper(_HeatMapper):
         xticklabels=True,
         yticklabels=True,
         mask=None,
+        **kwargs,
     ):
 
         super(_ScatterMapper, self).__init__(
@@ -44,6 +45,7 @@ class _ScatterMapper(_HeatMapper):
             annot=False,
             fmt=None,
             annot_kws=None,
+            **kwargs,
         )
 
         self.marker = marker
@@ -116,9 +118,6 @@ class _ScatterMapper(_HeatMapper):
             plt.setp(xtl, rotation="vertical")
         if axis_ticklabels_overlap(ytl):
             plt.setp(ytl, rotation="horizontal")
-
-        # Add the axis labels
-        ax.set(xlabel=self.xlabel, ylabel=self.ylabel)
 
         # Annotate the cells with the formatted values
         if self.annot:
