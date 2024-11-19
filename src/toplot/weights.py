@@ -190,6 +190,8 @@ def bar_plot(
     upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
     err = np.stack([estimate - lower, upper - estimate], axis=0)
 
+    assert np.all(err>=0), "(some) error values are negative, this might be because of the use of mean as height measure, using median solves this."
+
     if np.any(err < -1e-6):
         msg = "Negative error bars detected."
         if height == "mean":
