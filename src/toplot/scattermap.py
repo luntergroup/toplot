@@ -1,3 +1,9 @@
+"""Code to plot a heatmap with markers instead of filled squares.
+
+This code is based on the Github gist from Saulius Lukauskas:
+https://gist.github.com/lukauskas/f2f43aad6078a8b5d71b986174487b8c
+"""
+
 from seaborn.matrix import _HeatMapper
 from matplotlib import pyplot as plt
 import numpy as np
