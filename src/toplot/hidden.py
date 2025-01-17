@@ -1,4 +1,19 @@
-"""Visualization of hidden units/topic proportions"""
+"""Visualize point estimate or average of hidden units/topic proportions.
+
+This module provides functions to visualize how topics are distributed across records
+in your dataset. The input data should be organized as a DataFrame where:
+- Each row represents one example/record
+- Each column represents one topic
+- Values are proportions that sum to 1.0 across topics (columns)
+
+Example DataFrame structure:
+```python
+         Topic_1  Topic_2  Topic_3
+Alice    0.7     0.2      0.1
+Bob      0.3     0.6      0.1
+...
+```
+"""
 
 from typing import Literal
 
@@ -25,10 +40,13 @@ def _sorted_topic_proportions(hidden):
 def plot_cohort(
     hidden, sort: Literal["travelling-salesman"] | None = "travelling-salesman", ax=None
 ):
-    """Plot the topic proportions for a set of participants/examples/documents.
+    """Plot the average topic proportions for a set of records/participants/examples.
+
+    N.B., requires the posterior average or a point estimate of the hidden units/topic
+    proportions.
 
     Args:
-        hidden: For each participant/document (rows), the proportion per topic
+        hidden: For each record/participant (rows), the proportion per topic
             (columns).
         sort: Whether to sort the participants according to the shortest Jensen-Shannon
             distance path ("travelling-salesman"), or no sorting (None).
@@ -91,11 +109,11 @@ def plot_cohort(
 def plot_polar_cohort(
     hidden, ax=None, sort: Literal["travelling-salesman"] | None = "travelling-salesman"
 ):
-    """Make radial bar plots for a set of participants/examples/documents.
+    """Make radial bar plots for a set of records/participants/examples.
 
     Args:
-        hidden: For each participant (rows), the proportion per topic (columns).
-        sort: Whether to sort the participants according to the shortest Jensen-Shannon
+        hidden: For each record (rows), the proportion per topic (columns).
+        sort: Whether to sort the records according to the shortest Jensen-Shannon
             distance path ("travelling-salesman"), or no sorting (None).
         ax: Matplotlib axes to plot on.
 

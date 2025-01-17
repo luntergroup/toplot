@@ -1,4 +1,23 @@
-"""Visualization of the weights/components/topics with uncertainty estimates."""
+"""Visualization of topic model weights with uncertainty estimates.
+
+This module provides functions to visualize posterior samples from topic models. The input
+data should be organized as a pandas DataFrame with a two-level column structure:
+
+Level 1 (outer): Represents different multinomial groups (e.g., "demographics", "symptoms")
+Level 2 (inner): Categories within each multinomial (e.g., ["male", "female"] for "sex")
+
+Example DataFrame structure:
+```python
+            bmi                        sex
+            underweight   overweight   male   female
+sample_1    0.4           0.6          0.3      0.7
+sample_2    0.5           0.5          0.2      0.8
+...
+```
+
+Each row represents one posterior sample, and the values within each multinomial group
+should sum to 1.0.
+"""
 
 from typing import Literal
 
@@ -21,13 +40,15 @@ def bar_plot_stacked(
     labels: bool = True,
     fontsize=None,
 ):
-    """Plot posterior topic weights as probability bars by stacking items per set.
+    """Plot posterior of a topic as probability bars by stacking categories per set.
 
     Ags:
-        dataframe: Posterior samples (rows) of (normalized) one specific latent
-            component (topic). The dataframe consists of two-level columns to group
-            categories that belong to the same item set (i.e., multinomial). Second
-            level columns must sum to one.
+        dataframe: Posterior samples of a single topic organized as a DataFrame with
+            two-level columns:
+            - Level 1: Multinomial groups (e.g., "bmi", "sex")
+            - Level 2: Categories within each group (e.g., ["male", "female"])
+            Each row is one posterior sample, and values within each multinomial must
+            sum to 1.
         quantile_range: Range of quantiles to plot as error bars.
         height: How to compute the height of the bars.
         ax: Matplotlib axes to plot on.
@@ -137,12 +158,15 @@ def bar_plot(
     ax=None,
     color_xlabels: bool = False,
 ):
-    """Plot posterior of topic weights as an unfolded array of probability bars.
+    """Plot posterior of a topic weight as an unfolded array of probability bars.
 
     Args:
-        dataframe: Posterior samples (rows) of topic weights. This dataframe consists of
-            two-level columns that group categories that belong to the same multinomial.
-            Second level columns must sum to one.
+        dataframe: Posterior samples of a single topic organized as a DataFrame with
+            two-level columns:
+            - Level 1: Multinomial groups (e.g., "bmi", "sex")
+            - Level 2: Categories within each group (e.g., ["male", "female"])
+            Each row is one posterior sample, and values within each multinomial must
+            sum to 1.
         quantile_range: Range of quantiles to plot as error bars.
         height: How to compute the height of the bars.
         label: A legend label for the plot.
@@ -190,7 +214,9 @@ def bar_plot(
     upper = dataframe.apply(np.quantile, q=quantile_range[1], axis="rows")
     err = np.stack([estimate - lower, upper - estimate], axis=0)
 
-    assert np.all(err>=0), "(some) error values are negative, this might be because of the use of mean as height measure, using median solves this."
+    assert np.all(
+        err >= 0
+    ), "(some) error values are negative, this might be because of the use of mean as height measure, using median solves this."
 
     if np.any(err < -1e-6):
         msg = "Negative error bars detected."
