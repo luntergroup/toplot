@@ -1,5 +1,5 @@
 # Toplot
-[Reference docs](luntergroup.github.io/toplot)
+[Reference docs](https://luntergroup.github.io/toplot/)
 
 Visualizations for topic models.
 
@@ -23,35 +23,45 @@ import pandas as pd
 from numpy.random import dirichlet
 
 # Draw 1000 samples from "posterior" distribution.
-weights_bmi = dirichlet([16.0, 32.0, 32.0], size=1_000)
-weights_sex = dirichlet([8.1, 4.1], size=1_000)
-weights = pd.concat(
+weight_bmi = dirichlet([16.0, 32.0, 32.0], size=1_000)
+weight_sex = dirichlet([8.1, 4.1], size=1_000)
+weight = pd.concat(
     {
         "BMI": pd.DataFrame(
-            weights_bmi, columns=["Underweight", "Healthy Weight", "Overweight"]
+            weight_bmi, columns=["Underweight", "Healthy Weight", "Overweight"]
         ),
-        "sex": pd.DataFrame(weights_sex, columns=["Male", "Female"]),
+        "sex": pd.DataFrame(weight_sex, columns=["Male", "Female"]),
     },
     axis="columns",
 )
 ```
-This is how you visualize `weights`, including the 95% quantile range:
+Use [`bar_plot`](https://luntergroup.github.io/toplot/weights.html#toplot.weights.bar_plot) to visualize the topic `weight`, including the 95% quantile range:
 
 ![Visualization of topic weights with bar_plot.](gallery/figures/bar_plot.svg)
 ```python
-from toplot import bar_plot, bar_plot_stacked
+from toplot import bar_plot
 
-bar_plot(weights)
+bar_plot(weight)
 ```
 
-If you have many multinomials, you can reduce the size of the plot by folding the categories (e.g., "Underweight", "Healthy Weight", and "Overweight") belonging to the same multinomial (BMI) into a single bar
+If you have many multinomials, you can use [`bar_plot_stacked`](https://luntergroup.github.io/toplot/weights.html#toplot.weights.bar_plot_stacked) to reduce the width of the plot. This plot folds the categories (e.g., `"Underweight"`, `"Healthy Weight"`, and `"Overweight"`) belonging to the same multinomial (BMI) into a single bar.
 
 ![Visualization of topic weights with bar_plot_stacked.](gallery/figures/bar_plot_stacked.svg)
 ```python
 from toplot import bar_plot_stacked
 
-bar_plot_stacked(weights)
+bar_plot_stacked(weight)
 ```
+
+To visualize more than one topic at a time, you can make a scattermap with [`scattermap_plot`](https://luntergroup.github.io/toplot/weights.html#toplot.weights.scattermap_plot):
+```python
+from toplot import scattermap_plot
+
+scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
+```
+Resulting in:
+![Visualization of weights, with either counts of relative weights per 'word' and per 'topic' on the y- and x-axis, respectively.](gallery/figures/scattermap_plot.png)
+
 
 ### Visualizing hidden units (topic proportions, $\pmb{h}$ or $\pmb{\theta}$)
 Next, we plot the hidden units/topic identities $[\pmb{h}^{(1)}, \dots, \pmb{h}^{(m)}]^T$: that is, for each record $i$, the proportion over the components/topics. Let's generate the (average) proportion for $m=30$ records to visualize:
@@ -79,12 +89,3 @@ from toplot import plot_polar_cohort
 
 plot_polar_cohort(hidden)
 ```
-
-For the scattermap plot call:
-```python
-from toplot import scattermap_plot
-
-scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
-```
-Resulting in:
-![Visualization of weights, with either counts of relative weights per 'word' and per 'topic' on the y- and x-axis, respectively.](gallery/figures/scattermap_plot.png)
