@@ -258,14 +258,19 @@ def scattermap_plot(
     scale_val_y_counts=2,
     ax=None,
 ):
-    """
-    dataframe: dataframe in two levels {feature: words} containing phi, determines markers and their color
-    dataframe_counts: another dataframe of same structure containing counts, determines markersize and bars at the axes
-    marker_scaler: scale size of markers
-    scale_val_x_counts: scale bar size
-    scale_val_y_counts: scale bar size
+    """Plot posterior of a topic weight as an multicolored scattermap plot, with dotsize representing frequency of occurrence, color the value of phi,
+    with bars on the axes that show the axes total.
 
-    There are issues with figure size for very large dataframes (many topics), possibly fix for future use.
+    Args:
+        dataframe: dataframe in two levels of dimension [{feature: words}, n_components] containing phi, determines markers and their color
+        dataframe_counts: another dataframe of same dimension containing counts (or any other characteristic you want to use), determines markersize and bars at the axes
+        marker_scaler: this value scales the size of markers
+        scale_val_x_counts: scale bar size on the x-axis
+        scale_val_y_counts: scale bar size on the y-axis
+        ax: figure axes to use, if none a new figure is created
+
+    Returns:
+        Reference to matplotlib bar axes.
     """
 
     topic_counts = dataframe_counts.sum(axis=1) / dataframe_counts.sum().sum()
@@ -325,42 +330,4 @@ def scattermap_plot(
         )
 
         ax.set_ylim([-1.5, dataframe_counts.shape[1]])
-
-
-def top_words(dataframe, dataframe_counts, number_of_words, title=None):
-    """
-    Dataframe contains [n_topics, words] weights for words for topic distritibutions (phi)
-    Dataframe_counts contains (optionally) counts for n_tw (topic-word counts)
-    Visualize the most important 'words' of categories over featrures per latent variable.
-    """
-
-    n_topics = 6
-    color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
-    rcParams["figure.figsize"] = 3, 20
-    fig, ax = plt.subplots(nrows=6, ncols=1, sharex=True, sharey=False)
-    # plt.title('Top 10 words in the topics with their count')
-    plt.xlabel("Count")
-    plt.ylabel("Words")
-    plt.tight_layout()
-    for t in range(n_topics):
-        kleur = next(color)
-        for keys, vals in topic_top_words[t].items():
-            ax[t].barh(keys, vals, color=kleur)
-        n_topics = dataframe.shape[0]
-        topic_top_words = {}
-        for i in range(len(dataframe)):
-            topic_top_words[i] = {}
-            for column in dataframe_counts.iloc[i].nlargest(number_of_words).index:
-                topic_top_words[i][column] = dataframe_counts.loc[i, column]
-
-        color = iter(cm.rainbow(np.linspace(0, 1, n_topics)))
-        rcParams["figure.figsize"] = 3, 20
-        fig, ax = plt.subplots(nrows=n_topics, ncols=1, sharex=True, sharey=False)
-        plt.title(title)
-        plt.xlabel("Count")
-        plt.ylabel("Words")
-        plt.tight_layout()
-        for t in range(n_topics):
-            kleur = next(color)
-            for keys, vals in topic_top_words[t].items():
-                ax[t].barh(keys, vals, color=kleur)
+        return ax
