@@ -23,13 +23,11 @@ from typing import Literal
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
-from matplotlib.pyplot import cm, rcParams
 import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
-from .scattermap import scattermap
+from toplot.scattermap import scattermap
 
 
 def bar_plot_stacked(
@@ -162,7 +160,7 @@ def bar_plot(
 
     Args:
         dataframe: Posterior samples of a single topic organized as a DataFrame with
-            two-level columns:
+            two-level columns.
             - Level 1: Multinomial groups (e.g., "bmi", "sex")
             - Level 2: Categories within each group (e.g., ["male", "female"])
             Each row is one posterior sample, and values within each multinomial must
@@ -173,7 +171,7 @@ def bar_plot(
         ax: Matplotlib axes to plot on.
         color_xlabels: If `True`, pair the colours of the x-axis labels with the bars.
 
-        Example:
+    Example:
         ```python
         from numpy.random import dirichlet
         import pandas as pd

@@ -52,7 +52,8 @@ def plot_cohort(
             distance path ("travelling-salesman"), or no sorting (None).
         ax: Matplotlib axes to plot on.
 
-    Returns: Reference to matplotlib axes.
+    Returns:
+        Reference to matplotlib axes.
 
     Example:
         ```python
@@ -117,7 +118,8 @@ def plot_polar_cohort(
             distance path ("travelling-salesman"), or no sorting (None).
         ax: Matplotlib axes to plot on.
 
-    Returns: Reference to matplotlib axes.
+    Returns:
+        Reference to matplotlib axes.
 
     Example:
         ```python

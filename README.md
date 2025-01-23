@@ -53,14 +53,7 @@ from toplot import bar_plot_stacked
 bar_plot_stacked(weight)
 ```
 
-To visualize more than one topic at a time, you can make a scattermap with [`scattermap_plot`](https://luntergroup.github.io/toplot/weights.html#toplot.weights.scattermap_plot):
-```python
-from toplot import scattermap_plot
-
-scattermap_plot(dataframe=weights, dataframe_counts=weights, marker_scaler=100)
-```
-Resulting in:
-![Visualization of weights, with either counts of relative weights per 'word' and per 'topic' on the y- and x-axis, respectively.](gallery/figures/scattermap_plot.png)
+To visualize more than one topic at a time, you can make a scattermap with [`scattermap`](https://luntergroup.github.io/toplot/scattermap.html#toplot.scattermap.scattermap).
 
 
 ### Visualizing hidden units (topic proportions, $\pmb{h}$ or $\pmb{\theta}$)

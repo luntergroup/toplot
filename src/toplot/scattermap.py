@@ -1,6 +1,7 @@
 """Code to plot a heatmap with markers instead of filled squares.
 
-This code is based on the Github gist from Saulius Lukauskas:
+This code is based on the Github gist from, and with kind permission from, Saulius
+Lukauskas (HMGU):
 https://gist.github.com/lukauskas/f2f43aad6078a8b5d71b986174487b8c
 """
 
