@@ -332,8 +332,13 @@ def scattermap_plot(
         return ax
 
 
-def hinton(data: pd.DataFrame, max_weight=None, ax=None):
-    """Draw Hinton diagram for visualizing a the size and sign of a weight matrix.
+def hinton(
+    data: pd.DataFrame,
+    max_weight: float | None = None,
+    ax: plt.Axes | None = None,
+    grid: bool = True,
+):
+    r"""Draw Hinton diagram for visualizing a the size and sign of a weight matrix.
 
     A red (blue) marker indicates a positive (negative) weight. The size scales as
     $\propto \sqrt{|w|}$.
@@ -342,6 +347,7 @@ def hinton(data: pd.DataFrame, max_weight=None, ax=None):
         data: Weights to plot.
         max_weight: The size that corresponds to a full width marker.
         ax: Axes to plot on.
+        grid: Whether to draw a grid.
     """
     ax = ax if ax is not None else plt.gca()
 
@@ -362,6 +368,7 @@ def hinton(data: pd.DataFrame, max_weight=None, ax=None):
             size,
             facecolor=color,
             edgecolor=color,
+            zorder=3,
         )
         ax.add_patch(rect)
 
@@ -388,14 +395,21 @@ def hinton(data: pd.DataFrame, max_weight=None, ax=None):
     xticks, xtick_colours = _make_two_level_ticks(data.columns)
     ax.set_xticklabels(xticks, rotation=90)
     if xtick_colours is not None:
-        for xtick, color in zip(ax.get_xticklabels(), xtick_colours):
+        for j, (xtick, color) in enumerate(zip(ax.get_xticklabels(), xtick_colours)):
             xtick.set_color(color)
+            if grid:
+                ax.axvline(range_x[j], color=color, linewidth=0.75, zorder=2)
+    elif grid:
+        ax.xaxis.grid(True, zorder=1)
 
     yticks, ytick_colours = _make_two_level_ticks(data.index)
     ax.set_yticklabels(yticks)
     if ytick_colours is not None:
-        for ytick, color in zip(ax.get_yticklabels(), ytick_colours):
+        for i, (ytick, color) in enumerate(zip(ax.get_yticklabels(), ytick_colours)):
             ytick.set_color(color)
+            if grid:
+                ax.axhline(range_y[i], color=color, linewidth=0.75, zorder=2)
+    elif grid:
+        ax.yaxis.grid(True, zorder=1)
 
-    plt.grid(True, which="both")
     return ax
