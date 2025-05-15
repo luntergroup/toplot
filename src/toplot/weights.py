@@ -19,6 +19,7 @@ Each row represents one posterior sample, and the values within each multinomial
 should sum to 1.0.
 """
 
+from itertools import cycle
 from typing import Literal
 
 from matplotlib import pyplot as plt
@@ -329,3 +330,73 @@ def scattermap_plot(
 
         ax.set_ylim([-1.5, dataframe_counts.shape[1]])
         return ax
+
+
+def hinton(data: pd.DataFrame, max_weight=None, ax=None):
+    """Draw Hinton diagram for visualizing a the size and sign of a weight matrix.
+
+    A red (blue) marker indicates a positive (negative) weight. The size scales as
+    $\propto \sqrt{|w|}$.
+
+    Args:
+        data: Weights to plot.
+        max_weight: The size that corresponds to a full width marker.
+        ax: Axes to plot on.
+    """
+    ax = ax if ax is not None else plt.gca()
+
+    matrix = data.to_numpy().astype(float)
+    if not max_weight:
+        max_weight = 2 ** np.ceil(np.log2(np.abs(matrix).max()))
+
+    range_y = np.arange(data.shape[0], dtype=int) + 0.5
+    range_x = np.arange(data.shape[1], dtype=int) + 0.5
+    x, y = np.meshgrid(range_x, range_y)
+
+    for (i, j), w in np.ndenumerate(matrix):
+        color = "tab:red" if w > 0 else "tab:blue"
+        size = np.sqrt(abs(w) / max_weight)
+        rect = plt.Rectangle(
+            [x[i, j] - size / 2, y[i, j] - size / 2],
+            size,
+            size,
+            facecolor=color,
+            edgecolor=color,
+        )
+        ax.add_patch(rect)
+
+    ax.autoscale_view()
+    ax.invert_yaxis()
+    ax.set_xticks(range_x)
+    ax.set_yticks(range_y)
+
+    def _make_two_level_ticks(hierarchical_index: pd.MultiIndex) -> tuple:
+        """Make ticks for two-level MultiIndex."""
+        assert hierarchical_index.nlevels < 3
+        if hierarchical_index.nlevels == 1:
+            return hierarchical_index, None
+
+        repeated_colours = cycle(TABLEAU_COLORS)
+        groups = hierarchical_index.levels[0]
+        colour_of_group = dict(zip(groups, repeated_colours))
+        print(groups)
+        tick_labels = map(lambda x: ": ".join(x[-2:]), hierarchical_index)
+        tick_colours = [
+            colour_of_group[g] for g in hierarchical_index.get_level_values(0)
+        ]
+        return tick_labels, tick_colours
+
+    xticks, xtick_colours = _make_two_level_ticks(data.columns)
+    ax.set_xticklabels(xticks, rotation=90)
+    if xtick_colours is not None:
+        for xtick, color in zip(ax.get_xticklabels(), xtick_colours):
+            xtick.set_color(color)
+
+    yticks, ytick_colours = _make_two_level_ticks(data.index)
+    ax.set_yticklabels(yticks)
+    if ytick_colours is not None:
+        for ytick, color in zip(ax.get_yticklabels(), ytick_colours):
+            ytick.set_color(color)
+
+    plt.grid(True, which="both")
+    return ax
