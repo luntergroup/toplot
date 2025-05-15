@@ -379,7 +379,6 @@ def hinton(data: pd.DataFrame, max_weight=None, ax=None):
         repeated_colours = cycle(TABLEAU_COLORS)
         groups = hierarchical_index.levels[0]
         colour_of_group = dict(zip(groups, repeated_colours))
-        print(groups)
         tick_labels = map(lambda x: ": ".join(x[-2:]), hierarchical_index)
         tick_colours = [
             colour_of_group[g] for g in hierarchical_index.get_level_values(0)
