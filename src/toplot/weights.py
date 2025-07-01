@@ -31,6 +31,30 @@ import seaborn as sns
 from toplot.scattermap import scattermap
 
 
+def _bar(names, sizes, offsets, error_bars, color, transpose: bool = False, ax=None):
+    """Like matplotlib `bar` but can be transposed."""
+    if ax is None:
+        ax = plt.gca()
+
+    if not transpose:
+        return ax.bar(
+            names,
+            sizes,
+            bottom=offsets,
+            color=color,
+            yerr=error_bars,
+        )
+
+    ax.invert_yaxis()
+    return ax.barh(
+        names,
+        sizes,
+        left=offsets,
+        color=color,
+        xerr=error_bars,
+    )
+
+
 def bar_plot_stacked(
     dataframe,
     quantile_range=(0.025, 0.975),
@@ -38,6 +62,7 @@ def bar_plot_stacked(
     ax=None,
     labels: bool = True,
     fontsize=None,
+    transpose: bool = False,
 ):
     """Plot posterior of a topic as probability bars by stacking categories per set.
 
@@ -53,6 +78,7 @@ def bar_plot_stacked(
         ax: Matplotlib axes to plot on.
         labels: If `True`, annotate bars with category labels.
         fontsize: Font size for the category labels.
+        transpose: If `True`, swap the x and y axes of the bar plot.
 
     Example:
         ```python
@@ -126,26 +152,32 @@ def bar_plot_stacked(
             if j == n_categories - 1:
                 err_j = None
 
-            ax.bar(
+            _bar(
                 feature_name,
-                feature_weights.loc[category],
-                bottom=offsets[j],
+                sizes=feature_weights.loc[category],
+                offsets=offsets[j],
+                error_bars=err_j,
                 color=color,
-                yerr=err_j,
+                transpose=transpose,
+                ax=ax,
             )
             if labels:
-                ax.text(
-                    x=feature_name,
-                    y=offsets[j] + feature_weights.loc[category] / 2,
-                    s=category,
-                    ha="center",
-                    va="center",
-                    fontsize=fontsize,
+                text_properties = dict(
+                    s=category, ha="center", va="center", fontsize=fontsize
                 )
+                position = offsets[j] + feature_weights.loc[category] / 2
+                if not transpose:
+                    ax.text(x=feature_name, y=position, **text_properties)
+                else:
+                    ax.text(x=position, y=feature_name, **text_properties)
     # Rotate the x-axis labels.
-    ax.tick_params(axis="x", labelrotation=90, labelsize=fontsize)
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
-    ax.set_ylabel("Probability")
+    if not transpose:
+        ax.tick_params(axis="x", labelrotation=90, labelsize=fontsize)
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+        ax.set_ylabel("Probability")
+    else:
+        ax.xaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+        ax.set_xlabel("Probability")
     return ax
 
 
