@@ -7,7 +7,9 @@ import numpy as np
 import pandas as pd
 
 
-def _make_two_level_ticks(hierarchical_index: pd.MultiIndex) -> tuple:
+def _make_two_level_ticks(
+    hierarchical_index: pd.MultiIndex,
+) -> tuple[list[str], list[str]]:
     """Make ticks for two-level MultiIndex."""
     assert hierarchical_index.nlevels < 3
     if hierarchical_index.nlevels == 1:
@@ -18,7 +20,7 @@ def _make_two_level_ticks(hierarchical_index: pd.MultiIndex) -> tuple:
     colour_of_group = dict(zip(groups, repeated_colours))
     tick_labels = map(lambda x: ": ".join(x[-2:]), hierarchical_index)
     tick_colours = [colour_of_group[g] for g in hierarchical_index.get_level_values(0)]
-    return tick_labels, tick_colours
+    return list(tick_labels), tick_colours
 
 
 def _set_coloured_xticks(
