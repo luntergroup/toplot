@@ -257,7 +257,7 @@ def bar_plot(
 
     # Give each category set (=first column level) a different colour.
     multinomial_names = dataframe.columns.unique(level=0)
-    repeated_colours = 5 * tuple(TABLEAU_COLORS)  # Five times should suffice.
+    repeated_colours = cycle(TABLEAU_COLORS)
     colour_of_multinomial = dict(zip(multinomial_names, repeated_colours))
     colours = [
         colour_of_multinomial[name] for name in dataframe.columns.get_level_values(0)
