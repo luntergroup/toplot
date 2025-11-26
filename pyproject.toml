@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "toplot"
-version = "1.1.0"
+version = "1.1.1"
 description = "Visualize the weights (i.e., topics) and hidden units (i.e., topic proportions) of topic models"
 authors = [
   {name = "Hylke Donker", email = "h.c.donker@umcg.nl"},

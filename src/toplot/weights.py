@@ -28,7 +28,13 @@ import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
 from toplot.scattermap import scattermap
+from toplot.utils import (
+    _make_two_level_ticks,
+    _set_coloured_xticks,
+    _set_coloured_yticks,
+)
 
 
 def _bar(names, sizes, offsets, error_bars, color, transpose: bool = False, ax=None):
@@ -409,39 +415,22 @@ def hinton(
     ax.set_xticks(range_x)
     ax.set_yticks(range_y)
 
-    def _make_two_level_ticks(hierarchical_index: pd.MultiIndex) -> tuple:
-        """Make ticks for two-level MultiIndex."""
-        assert hierarchical_index.nlevels < 3
-        if hierarchical_index.nlevels == 1:
-            return hierarchical_index, None
-
-        repeated_colours = cycle(TABLEAU_COLORS)
-        groups = hierarchical_index.levels[0]
-        colour_of_group = dict(zip(groups, repeated_colours))
-        tick_labels = map(lambda x: ": ".join(x[-2:]), hierarchical_index)
-        tick_colours = [
-            colour_of_group[g] for g in hierarchical_index.get_level_values(0)
-        ]
-        return tick_labels, tick_colours
-
     xticks, xtick_colours = _make_two_level_ticks(data.columns)
-    ax.set_xticklabels(xticks, rotation=90)
-    if xtick_colours is not None:
-        for j, (xtick, color) in enumerate(zip(ax.get_xticklabels(), xtick_colours)):
-            xtick.set_color(color)
-            if grid:
+    _set_coloured_xticks(xticks, xtick_colours, ax, rotation=90)
+    if grid:
+        if xtick_colours is not None:
+            for j, color in enumerate(xtick_colours):
                 ax.axvline(range_x[j], color=color, linewidth=0.75, zorder=2)
-    elif grid:
-        ax.xaxis.grid(True, zorder=1)
+        else:
+            ax.xaxis.grid(True, zorder=1)
 
     yticks, ytick_colours = _make_two_level_ticks(data.index)
-    ax.set_yticklabels(yticks)
-    if ytick_colours is not None:
-        for i, (ytick, color) in enumerate(zip(ax.get_yticklabels(), ytick_colours)):
-            ytick.set_color(color)
-            if grid:
+    _set_coloured_yticks(yticks, ytick_colours, ax)
+    if grid:
+        if ytick_colours is not None:
+            for i, color in enumerate(ytick_colours):
                 ax.axhline(range_y[i], color=color, linewidth=0.75, zorder=2)
-    elif grid:
-        ax.yaxis.grid(True, zorder=1)
+        else:
+            ax.yaxis.grid(True, zorder=1)
 
     return ax
