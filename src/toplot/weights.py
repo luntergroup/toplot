@@ -24,6 +24,7 @@ from typing import Literal
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
+from matplotlib.patches import Patch
 import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
@@ -194,6 +195,7 @@ def bar_plot(
     label=None,
     ax=None,
     color_xlabels: bool = False,
+    legend: bool = False,
 ):
     """Plot posterior of a topic weight as an unfolded array of probability bars.
 
@@ -209,6 +211,7 @@ def bar_plot(
         label: A legend label for the plot.
         ax: Matplotlib axes to plot on.
         color_xlabels: If `True`, pair the colours of the x-axis labels with the bars.
+        legend: If `True`, show a legend that explains the bar colors.
 
     Example:
         ```python
@@ -262,15 +265,8 @@ def bar_plot(
         raise ValueError(msg)
 
     # Give each category set (=first column level) a different colour.
-    multinomial_names = dataframe.columns.unique(level=0)
-    repeated_colours = cycle(TABLEAU_COLORS)
-    colour_of_multinomial = dict(zip(multinomial_names, repeated_colours))
-    colours = [
-        colour_of_multinomial[name] for name in dataframe.columns.get_level_values(0)
-    ]
-    feature_names = [
-        f"{set_name}: {item_name}" for set_name, item_name in dataframe.columns
-    ]
+    groups = dataframe.columns.levels[0]
+    feature_names, colours = _make_two_level_ticks(dataframe.columns)
 
     ax.bar(feature_names, height=estimate, yerr=err, label=label, color=colours)
     ax.set_ylabel("Probability")
@@ -278,8 +274,19 @@ def bar_plot(
 
     if color_xlabels:
         # Set the color of the x-tick labels to match the corresponding bar color.
-        for xtick, color in zip(ax.get_xticklabels(), colours):
-            xtick.set_color(color)
+        _set_coloured_xticks(feature_names, colours, ax)
+
+    # Add a legend indicating what the colours mean.
+    if legend:
+        legend_handles = [
+            Patch(color=c, label=gp) for c, gp in zip(cycle(TABLEAU_COLORS), groups)
+        ]
+        legend_title = "Groups"
+        if dataframe.columns.names[0]:
+            legend_title = dataframe.columns.names[0]
+        legend_title = legend_title.capitalize()
+
+        ax.legend(handles=legend_handles, title=legend_title, bbox_to_anchor=(1.0, 1))
 
     margin = 0.025
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
