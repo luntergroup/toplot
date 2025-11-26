@@ -31,7 +31,7 @@ def _set_coloured_xticks(
 ):
     """Color x-axis `ticks` with `tick_colours`."""
     ax = axes if axes is not None else plt.gca()
-    range_x = np.arange(len(ticks), dtype=int)
+    range_x = np.arange(len(ticks)) + 0.5
     ax.set_xticks(range_x)
     ax.set_xticklabels(ticks, **kwargs)
     if tick_colours is not None:
@@ -47,7 +47,7 @@ def _set_coloured_yticks(
 ):
     """Color y-axis `ticks` with `tick_colours`."""
     ax = axes if axes is not None else plt.gca()
-    range_y = np.arange(len(ticks), dtype=int)
+    range_y = np.arange(len(ticks)) + 0.5
     ax.set_yticks(range_y)
     ax.set_yticklabels(ticks, **kwargs)
     if tick_colours is not None:

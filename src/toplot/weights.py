@@ -400,8 +400,8 @@ def hinton(
     if not max_weight:
         max_weight = 2 ** np.ceil(np.log2(np.abs(matrix).max()))
 
-    range_y = np.arange(data.shape[0], dtype=int) + 0.5
-    range_x = np.arange(data.shape[1], dtype=int) + 0.5
+    range_y = np.arange(data.shape[0]) + 0.5
+    range_x = np.arange(data.shape[1]) + 0.5
     x, y = np.meshgrid(range_x, range_y)
 
     for (i, j), w in np.ndenumerate(matrix):
