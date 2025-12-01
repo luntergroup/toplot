@@ -11,8 +11,7 @@ authors = [
   {name = "Dorien Neijzen", email = "d.neijzen@umcg.nl"},
   ]
 readme = "README.md"
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = { text = "MIT" }
 keywords =[ "topic models", "visualization"]
 requires-python = ">=3.10"
 dependencies = [
