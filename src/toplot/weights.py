@@ -44,22 +44,11 @@ def _bar(names, sizes, offsets, error_bars, color, transpose: bool = False, ax=N
         ax = plt.gca()
 
     if not transpose:
-        return ax.bar(
-            names,
-            sizes,
-            bottom=offsets,
-            color=color,
-            yerr=error_bars,
-        )
+        return ax.bar(names, sizes, bottom=offsets, color=color, yerr=error_bars)
 
+    ax.barh(names, sizes, left=offsets, color=color, xerr=error_bars)
     ax.invert_yaxis()
-    return ax.barh(
-        names,
-        sizes,
-        left=offsets,
-        color=color,
-        xerr=error_bars,
-    )
+    return ax
 
 
 def bar_plot_stacked(
@@ -400,8 +389,8 @@ def hinton(
     if not max_weight:
         max_weight = 2 ** np.ceil(np.log2(np.abs(matrix).max()))
 
-    range_y = np.arange(data.shape[0]) + 0.5
-    range_x = np.arange(data.shape[1]) + 0.5
+    range_y = np.arange(data.shape[0])
+    range_x = np.arange(data.shape[1])
     x, y = np.meshgrid(range_x, range_y)
 
     for (i, j), w in np.ndenumerate(matrix):
