@@ -38,6 +38,10 @@ def _set_coloured_xticks(
         for xtick, color in zip(ax.get_xticklabels(), tick_colours):
             xtick.set_color(color)
 
+        for tick, color in zip(ax.xaxis.get_major_ticks(), tick_colours):
+            tick.tick1line.set_markeredgecolor(color)  # Color the left line
+            tick.tick2line.set_markeredgecolor(color)  # Color the right line
+
 
 def _set_coloured_yticks(
     ticks: Iterable,
@@ -53,3 +57,7 @@ def _set_coloured_yticks(
     if tick_colours is not None:
         for ytick, color in zip(ax.get_yticklabels(), tick_colours):
             ytick.set_color(color)
+
+        for tick, color in zip(ax.yaxis.get_major_ticks(), tick_colours):
+            tick.tick1line.set_markeredgecolor(color)  # Color the left line
+            tick.tick2line.set_markeredgecolor(color)  # Color the right line
